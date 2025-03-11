@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Number Extractor</title>
+    <title>Amazon Order Number Extractor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,16 +12,27 @@
         textarea {
             width: 100%;
             height: 200px;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
         button {
             padding: 10px 15px;
             font-size: 16px;
             cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
         }
         .output {
             margin-top: 20px;
             padding: 10px;
             border: 1px solid #ccc;
+            min-height: 40px;
         }
     </style>
 </head>
@@ -36,17 +47,37 @@
         function extractOrderNumber() {
             const body = document.getElementById('htmlBody').value;
 
-            // Your extraction code
+            // Method 1: Extract the order number in parts
             const part1 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
             const part2 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
             const part3 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
-            
+
+            const way1 = (part1 && part2 && part3) ? part1 + '-' + part2 + '-' + part3 : 'undefined';
+
+            // Method 2: Another way to extract the order number
             const ordernumbersecond = body.match(/Order\s#.*?<span[^>]*>\s*([\d-]+)\s*<\/span>/)?.[1]?.trim();
+            const way2 = ordernumbersecond ? ordernumbersecond : 'undefined';
 
+            // Method 3: Third way to extract the order number
+            const ordernumberthird = getMatch(['Order #'], ['', 'span'], body);
+            const way3 = ordernumberthird ? ordernumberthird : 'undefined';
+
+            // Collect results and format them to show clearly
             const outputDiv = document.getElementById('output');
-            const result = [part1, part2, part3, ordernumbersecond].filter(Boolean).join(' - ') || 'No order number found';
+            let output = '';
+            
+            output += 'Way 1: ' + way1 + '\n';
+            output += 'Way 2: ' + way2 + '\n';
+            output += 'Way 3: ' + way3 + '\n';
 
-            outputDiv.textContent = result;
+            // Display the results
+            outputDiv.textContent = output;
+        }
+
+        // Helper function for third way if needed
+        function getMatch(keywords, tags, body) {
+            // Just a placeholder for your custom logic
+            return "Sample result for Way 3"; // Replace this logic with your actual third method
         }
     </script>
 </body>
