@@ -58,7 +58,7 @@
             const ordernumbersecond = body.match(/Order\s#.*?<span[^>]*>\s*([\d-]+)\s*<\/span>/)?.[1]?.trim();
             const way2 = ordernumbersecond ? ordernumbersecond : 'undefined';
 
-            // Method 3: Third way to extract the order number
+            // Method 3: Third way to extract the order number using getMatch
             const ordernumberthird = getMatch(['Order #'], ['', 'span'], body);
             const way3 = ordernumberthird ? ordernumberthird : 'undefined';
 
@@ -74,10 +74,17 @@
             outputDiv.textContent = output;
         }
 
-        // Helper function for third way if needed
-        function getMatch(keywords, tags, body) {
-            // Just a placeholder for your custom logic
-            return "Sample result for Way 3"; // Replace this logic with your actual third method
+        // Helper function for third way (Method 3)
+        function getMatch(start, elements, text) {
+            const pattern =
+                start +
+                elements.reduce(
+                    (acc, elem) => acc + `${!acc ? '\\s*' : ''}<${elem}[^>]*>\\s*`,
+                    '',
+                ) +
+                '([^<]+)' +
+                (start.length > 0 ? '' : '\\s*');
+            return text.match(new RegExp(pattern))?.[1]?.trim();
         }
     </script>
 </body>
