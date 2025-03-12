@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Order Number Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Amazon Delivered Order Number Extractor</h1>
+    <textarea id="htmlBody" placeholder="Paste the full HTML of your Amazon order page here..."></textarea>
+    <br>
+    <button onclick="extractOrderNumber()">Extract Order Number</button>
+    <div class="output" id="output"></div>
+
+    <script>
+        function extractOrderNumber() {
+            const body = document.getElementById('htmlBody').value;
+
+            // Method 1: Extract the order number in parts
+            const part1 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const part2 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const part3 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+    
+            const way1 = (part1 && part2 && part3) ? `${part1}-${part2}-${part3}` : 'Not Found';
+
+            // Method 2: Alternative extraction
+            const orderNumberMatch = body.match(/Order #<\/span><\/div><\/td><\/tr><tr><td[^>]*><div[^>]*><span[^>]*>([\d-]+)/);
+            const way2 = orderNumberMatch ? orderNumberMatch[1] : 'Not Found';
+
+            // Method 3: Extract order number using `matchAll`
+            function matchAll(text, regex, max = 3) {
+                let match;
+                let count = 0;
+                let result = [];
+                while ((match = regex.exec(text)) !== null && count < max) {
+                    result.push(match[1].trim());
+                    count++;
+                }
+                return result.length ? result.join('-') : 'Not Found';
+            }
+
+            const way3 = matchAll(body, /<span[^>]*>(\d+)<\/span>/g);
+
+            // Display results
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = `
+                <strong>Way 1:</strong> ${way1} <br>
+                <strong>Way 2:</strong> ${way2} <br>
+                <strong>Way 3:</strong> ${way3} <br>
+            `;
+        }
+    </script>
+</body>
+</html>
