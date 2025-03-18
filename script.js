@@ -88,7 +88,8 @@ function processOrder() {
             // way 1
            const priceregex = /Total.*?(\$\d+\.\d{2})/;
            const pricematch = body.match(priceregex);
-           const oqtopricey1 = pricematch[1];
+           const oqtopricey1 = pricematch ? pricematch[1] : null;
+
             // way 2
            const totalPay = body.match(/Order Total:\s*<\/span>\s*<\/p>\s*<\/td>\s*<td[^>]>\s<p[^>]>\s<span[^>]>\s\$([\d,.]+)/)?.[1];
            const oprice2 = +totalPay?.replace(/,/g, '');
