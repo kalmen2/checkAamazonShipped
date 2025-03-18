@@ -24,7 +24,7 @@ function getMatch([start, end = ''], elements, text) {
 function processOrder() {
     let body = document.getElementById("htmlInput").value;
     let type = document.getElementById("statusSelect").value;
-    let orderNumber, orderDate, qty, totalprice, priceEach;
+    let orderNumber, itemName, orderDate, qty, totalprice, priceEach;
     
 
     switch (type) {
@@ -118,59 +118,72 @@ function processOrder() {
                // Remove '$' if it exists and convert to number
                totalprice = parseFloat(totalprice.replace('$', ''));
             }
-            
+
            priceEach = totalprice / qty;
 
            itemName = "will be added later";
 
            break;
 
-    
-
-            
-
-
-
-
-
         case 'shipped':
-            const part1s = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
-            const part2s = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
-            const part3s = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
-            orderNumber = part1s + '-' + part2s + '-' + part3s;
-        
-            if (/^\d{3}-\d{7}-\d{7}$/.test(orderNumber)){
-                const part1s = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
-                const part2s = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
-                const part3s = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
-                orderNumber = part1s + '-' + part2s + '-' + part3s;
-            }
-            else {
-                const ordernumber2s = body.match(/Order\s#.*?<span[^>]*>\s*([\d-]+)\s*<\/span>/)?.[1]?.trim();
-                orderNumber = ordernumber2s;
-            }
-            if (/^\d{3}-\d{7}-\d{7}$/.test(orderNumber)){
-                const ordernumber2s = body.match(/Order\s#.*?<span[^>]*>\s*([\d-]+)\s*<\/span>/)?.[1]?.trim();
-                orderNumber = ordernumber2s;
-            }
-            else {
-            const ordernumber3s = getMatch(['Order #'], ['', 'span'], body);
-            orderNumber = ordernumber3s;
-            }
-            if (/^\d{3}-\d{7}-\d{7}$/.test(orderNumber)){
-                const ordernumber3s = getMatch(['Order #'], ['', 'span'], body);
-                orderNumber = ordernumber3s;
-            }
-            else {
-                orderNumber = "Not found";
-            }
+            const spart1 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const spart2 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const spart3 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const sorder1 = spart1 + "-" + spart2 + "-" + spart3;
+            // second way
+            const sorder2 = body.match(/Order\s#.*?<span[^>]*>\s*([\d-]+)\s*<\/span>/)?.[1]?.trim();
+            //  third way
+            const sorder3 = getMatch(['Order #'], ['', 'span'], body);
+            // fourth way
+            const smatch4 = body.match(/orderId%3D(\d{3}-\d{7}-\d{7})/);  
+            const sorder4 = smatch4 ? smatch4[1] : "Order Number not found.";
+            
            
+            if (/^\d{3}-\d{7}-\d{7}$/.test(sorder1)){
+                orderNumber = sorder1
+            }else if (/^\d{3}-\d{7}-\d{7}$/.test(sorder2)){
+                orderNumber = sorder2
+            }else if (/^\d{3}-\d{7}-\d{7}$/.test(sorder3)){
+                orderNumber = sorder3
+            }else if (/^\d{3}-\d{7}-\d{7}$/.test(sorder4)){
+                orderNumber = sorder4
+            }else{
+                orderNumber = "order number not found "
+            }
+            // if in body    
+            if (double) {
+                console.log(true);
+            }
+
+
             break;
         case 'delivered':
 
-                orderNumber = body.match(/Order #<\/span><\/div><\/td><\/tr><tr><td[^>]*><div[^>]*><span[^>]*>([\d-]+)/)?.[1] || 
-                matchAll(body, /<span[^>]*>(\d+)<\/span>/g, 3);
+            // first way
+            const dorder1 = body.match(/Order #<\/span><\/div><\/td><\/tr><tr><td[^>]*><div[^>]*><span[^>]*>([\d-]+)/)?.[1];
+            //second way
+            const dopart1 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const dopart2 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const dopart3 = body.match(/Order\s#<\/span>\s*<span[^>]*>[^<]*<span[^>]*>\d+<\/span>-\s*<span[^>]*>\d+<\/span>-\s*<span[^>]*>(\d+)<\/span>/)?.[1]?.trim();
+            const dorder2 = dopart1 + "-"+ dopart2 + "-" + dopart3;
+            // third way 
+            const dorder3 = (matchAll(body, /<span[^>]*>(\d+)<\/span>/g, 3));
             
+            if (/^\d{3}-\d{7}-\d{7}$/.test(dorder1)){
+                orderNumber = dorder1
+            }else if (/^\d{3}-\d{7}-\d{7}$/.test(dorder2)){
+                orderNumber = dorder2
+            }else if (/^\d{3}-\d{7}-\d{7}$/.test(dorder3)){
+                orderNumber = dorder3
+            }else{
+                orderNumber = "order number not found "
+            }
+            
+            // if in body    
+            if (double) {
+                console.log(true);
+            }
+
             break;
     }
 
