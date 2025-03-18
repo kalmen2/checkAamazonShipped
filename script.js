@@ -45,6 +45,11 @@ function processOrder() {
             const oway4 = body.match(/Order #\s*<\/span>\s*<\/p>\s*<p[^>]*>\s*<span[^>]*>\s*(\d{3}-\d{7}-\d{7})<\/span>/)?.[1] || null;
             // Fifth way
             const oway5 = getMatch(['Order #'], ['', 'span'], body);
+            // Sixth way
+            const orderRegex5 = /Order #.*?(\d{3}-\d{7}-\d{7})/;
+            const orderMatch5 = body.match(orderRegex5);
+            const oway6 = orderMatch5 ? orderMatch5[1] : "Order not found";
+
 
 
             if (/^\d{3}-\d{7}-\d{7}$/.test(oway1)){
@@ -61,10 +66,12 @@ function processOrder() {
             else if (/^\d{3}-\d{7}-\d{7}$/.test(oway5)){    
                 orderNumber = oway5;
             }
-            else {
-                orderNumber = oway5;
+            else if (/^\d{3}-\d{7}-\d{7}$/.test(oway6)){
+                orderNumber = oway6;
             }
-
+            else {
+                orderNumber = "Not found";
+            }
 
 
             // quantity
@@ -86,25 +93,32 @@ function processOrder() {
             
             // price
             // way 1
-          const priceregex = /Total.*?(\$\d+\.\d{2})/;
-            const pricematch = body.match(priceregex);
-            const oqtopricey1 = pricematch ? pricematch[1] : "Price not found";
-
-
+            const priceregex = /Total.*?(\$\d+\.\d{2})/;
+            const oprice1 = body.match(priceregex);
             // way 2
            const totalPay = body.match(/Order Total:\s*<\/span>\s*<\/p>\s*<\/td>\s*<td[^>]>\s<p[^>]>\s<span[^>]>\s\$([\d,.]+)/)?.[1];
            const oprice2 = +totalPay?.replace(/,/g, '');
-           
-           if (oqtopricey1){
-                totalprice = oqtopricey1;
-              } 
-            else if (oprice2){
+            //  way 3
+           const oprice3 = parseFloat(body.match(/Order Total:\s*<\/span>\s*<\/p>\s*<\/td>\s*<td[^>]*>\s*<p[^>]*>\s*<span[^>]*>\s*\$([\d,.]+)/)?.[1]?.replace(/,/g, '')) || 0;
+
+           if (oprice1){
+                totalprice = oprice1[1];
+              } else if (oprice2){ 
                 totalprice = oprice2;
               }
-            else {
-                totalprice = "Not found";
-                }
- 
+              else if (oprice3){
+                totalprice = oprice3;
+              }
+              else {
+                totalprice = oprice3;
+              }
+           // price each
+           
+           if (typeof totalprice === 'string') {
+               // Remove '$' if it exists and convert to number
+               totalprice = parseFloat(totalprice.replace('$', ''));
+            }
+            
            priceEach = totalprice / qty;
 
            itemName = "will be added later";
